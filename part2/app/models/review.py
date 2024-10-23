@@ -1,10 +1,10 @@
 from app.models.basemodel import BaseModel
-from place import Place
-from user import User
+from app.models.place import Place
+from app.models.user import User
 
 class Review(BaseModel):
     def __init__(self, text: str, rating: int, place: Place, user: User):
-        super().__init__
+        super().__init__()
         if self.validate_text(text):
             self.text = text
         if self.validate_rating(rating):

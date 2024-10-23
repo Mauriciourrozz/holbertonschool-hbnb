@@ -1,12 +1,12 @@
 from app.models.basemodel import BaseModel
-from user import User
+from app.models.user import User
 
 class Place(BaseModel):
     def __init__(self, title: str, description: str, price: float, latitude: float, longitude: float, owner: User):
-        super().__init__
+        super().__init__()
         if self.validate_title(title):
             self.title = title
-        if self.vaidate_description(description):
+        if self.validate_description(description):
             self.description = description
         if self.validate_price(price):
             self.price = price
@@ -35,7 +35,7 @@ class Place(BaseModel):
 
     @staticmethod
     def validate_price(price):
-        if type(price) is not float:
+        if type(price) is not float and type(price) is not int:
             raise ValueError("Error: Price not valid")
         if price < 0:
             raise ValueError("Price must be greater than 0")
@@ -43,7 +43,7 @@ class Place(BaseModel):
 
     @staticmethod
     def validate_latitude(latitude):
-        if type(latitude) is not float:
+        if type(latitude) is not float and type(latitude) is not int:
             raise TypeError("Latitude not valid")
         if latitude > 90.0 or latitude < -90.0:
             raise ValueError("Latitude not valid")
@@ -51,10 +51,10 @@ class Place(BaseModel):
 
     @staticmethod
     def validate_longitude(longitude):
-        if type(longitude) is not float:
-            raise TypeError("Latitude not valid")
-        if longitude > 90.0 or longitude < -90.0:
-            raise ValueError("Latitude not valid")
+        if type(longitude) is not float and type(longitude) is not int:
+            raise TypeError("Longitude not valid")
+        if longitude > 180.0 or longitude < -180.0:
+            raise ValueError("Longitude not valid")
         return True
 
     def add_review(self, review):
