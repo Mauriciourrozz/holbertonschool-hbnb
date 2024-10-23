@@ -1,4 +1,4 @@
-from basicmodel import BaseModel
+from app.models.basemodel import BaseModel
 from place import Place
 from user import User
 
@@ -20,11 +20,11 @@ class Review(BaseModel):
             raise TypeError("Empty review")
         if type(text) is not str:
             raise TypeError("Review not valid")
-        return text
+        return True
 
     @staticmethod
     def validate_rating(rating):
         if rating > 0 or rating < 6:
-            return rating
+            return True
         else:
             raise ValueError("Rating must be between 1 and 5")

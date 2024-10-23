@@ -1,13 +1,13 @@
 import re
-from basicmodel import BaseModel
+from app.models.basemodel import BaseModel
 
 class User(BaseModel):
     def __init__(self, first_name: str, last_name: str, email: str, is_admin=False):
         super().__init__
-        if self.validate_first_name(self.first_name) and self.validate_last_name(self.last_name):
+        if self.validate_first_name(first_name) and self.validate_last_name(last_name):
             self.first_name = first_name
             self.last_name = last_name
-        if self.validate_email(self.email):
+        if self.validate_email(email):
             self.email = email
         self.is_admin = is_admin
 
@@ -17,7 +17,7 @@ class User(BaseModel):
             raise TypeError("Name not valid")
         if len(first_name) > 50:
             raise ValueError("Name cannot contain more than 50 characters")
-        return first_name
+        return True
 
     @staticmethod
     def validate_last_name(last_name):
@@ -25,7 +25,7 @@ class User(BaseModel):
             raise TypeError("Name not valid")
         if len(last_name) > 50:
             raise ValueError("Name cannot contain more than 50 characters")
-        return last_name
+        return True
 
     @staticmethod
     def validate_email(email):
