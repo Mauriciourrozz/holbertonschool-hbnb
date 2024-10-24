@@ -1,5 +1,7 @@
+from flask import json, jsonify, request
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from app.models.user import User
 
 api = Namespace('users', description='User operations')
 
@@ -26,9 +28,14 @@ class UserList(Resource):
 
         new_user = facade.create_user(user_data)
         return {'id': new_user.id, 'first_name': new_user.first_name, 'last_name': new_user.last_name, 'email': new_user.email}, 201
-    
+
     def get(self):
-        ...
+        lista = []
+        lista2 = facade.get_all()
+        for i in lista2:
+            serializado = i.serializar_usuario()
+            lista.append(serializado)
+        return lista
 
 @api.route('/<user_id>')
 class UserResource(Resource):
@@ -41,5 +48,20 @@ class UserResource(Resource):
             return {'error': 'User not found'}, 404
         return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
     
-    def put(self):
-        ...
+    
+    @api.expect(user_model, validate=True)
+    @api.response(200, 'User successfully created')
+    @api.response(400, 'Missing data')
+    def put(self, user_id):
+        if not request.is_json:
+            return {"error": "Unsupported Media Type. Content-Type should be 'application/json'"}, 415
+
+        data = api.payload
+        if not data.get("first_name") or not data.get("last_name") or not data.get("email"):
+            return {"error": "Missing data"}, 400
+
+        user = facade.update(user_id, data)
+        data['id'] = user_id
+
+        return jsonify(data)
+    
