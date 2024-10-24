@@ -28,3 +28,10 @@ class Review(BaseModel):
             return True
         else:
             raise ValueError("Rating must be between 1 and 5")
+
+    def serializar_reviews(self):
+        return {
+            'id': self.id,
+            'text': self.text,
+            'rating': self.rating
+        }

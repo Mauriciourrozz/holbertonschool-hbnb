@@ -62,3 +62,11 @@ class Place(BaseModel):
 
     def add_amenity(self, amenity):
         self.amenities.append(amenity)
+
+    def serializar_places(self):
+            return {
+                "id": self.id,
+                "title": self.title,
+                "latitude": self.latitude,
+                "longitude": self.longitude
+            }
