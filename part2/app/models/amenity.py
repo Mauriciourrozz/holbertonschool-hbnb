@@ -6,3 +6,9 @@ class Amenity(BaseModel):
         if type(name) is str and len(name) <= 50:
             self.name = name
 
+    def serializar_amenities(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
