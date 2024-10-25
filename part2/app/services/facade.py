@@ -12,7 +12,7 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
-    # Placeholder method for creating a user
+    # Functions for user
     def create_user(self, user_data):
         user = User(**user_data)
         self.user_repo.add(user)
@@ -31,7 +31,7 @@ class HBnBFacade:
         return self.user_repo.update(user_id, data)
 
 
-    #Placeholder methods for creating an amenities
+    # Functions for Amenities
     def create_amenity(self, amenity_data):
         amenities = Amenity(**amenity_data)
         self.amenity_repo.add(amenities)
@@ -47,7 +47,7 @@ class HBnBFacade:
         return self.amenity_repo.update(amenity_id, amenity_data)
 
 
-    #Placeholder methods for creating a place
+    # Functions for place
     def create_place(self, place_data):
         place = Place(**place_data)
         self.place_repo.add(place)
@@ -63,7 +63,7 @@ class HBnBFacade:
         return self.place_repo.update(place_id, place_data)
 
 
- # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
+    # Functions for review
     def create_review(self, review_data):
         review = Review(**review_data)
         self.review_repo.add(review)

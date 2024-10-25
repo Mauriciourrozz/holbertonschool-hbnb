@@ -3,16 +3,14 @@ from app.models.place import Place
 from app.models.user import User
 
 class Review(BaseModel):
-    def __init__(self, text: str, rating: int, place: Place, user: User):
+    def __init__(self, text: str, rating: int, place_id , user_id):
         super().__init__()
         if self.validate_text(text):
             self.text = text
         if self.validate_rating(rating):
             self.rating = rating
-        if isinstance(place, Place):
-            self.place = place
-        if isinstance(user, User):
-            self.user = user
+        self.place_id = place_id
+        self.user_id = user_id
 
     @staticmethod
     def validate_text(text):

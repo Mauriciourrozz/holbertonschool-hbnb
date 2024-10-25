@@ -2,7 +2,7 @@ from app.models.basemodel import BaseModel
 from app.models.user import User
 
 class Place(BaseModel):
-    def __init__(self, title: str, description: str, price: float, latitude: float, longitude: float, owner: User):
+    def __init__(self, title: str, description: str, price: float, latitude: float, longitude: float, owner_id, amenities):
         super().__init__()
         if self.validate_title(title):
             self.title = title
@@ -14,10 +14,9 @@ class Place(BaseModel):
             self.latitude = latitude
         if self.validate_longitude(longitude):
             self.longitude = longitude
-        if isinstance(owner, User):
-            self.owner = owner
+        self.owner_id = owner_id
         self.reviews = []
-        self.amenities = []
+        self.amenities = [amenities]
 
     @staticmethod
     def validate_title(title):

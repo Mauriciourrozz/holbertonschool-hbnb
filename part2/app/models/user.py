@@ -34,7 +34,7 @@ class User(BaseModel):
             return True
         else:
             raise TypeError("Email not valid")
-    
+
     def serializar_usuario(self):
         return {
             "id": self.id,

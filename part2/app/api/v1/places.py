@@ -1,4 +1,4 @@
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Namespace, Resource, fields, marshal
 from app.services import facade
 from app.models.user import User
 from app.models.place import Place
@@ -36,16 +36,18 @@ class PlaceList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         place_data = api.payload
-        
+
         new_place = facade.create_place(place_data)
+
         return {
-          "title": new_place.title,
-          "description": new_place.description,
-          "price": new_place.price,
-          "latitude": new_place.latitude,
-          "longitude": new_place.longitude,
-          "owner_id": #acceder al id del usuario
-          #acceder a las amenities
+            "id": new_place.id,
+            "title": new_place.title,
+            "description": new_place.description,
+            "price": new_place.price,
+            "latitude": new_place.latitude,
+            "longitude": new_place.longitude,
+            "owner_id": new_place.owner_id,
+            "amenities": new_place.amenities
         }
 
     @api.response(200, 'List of places retrieved successfully')
@@ -64,15 +66,7 @@ class PlaceResource(Resource):
     @api.response(404, 'Place not found')
     def get(self, place_id):
         place = facade.get_place(place_id)
-        return {
-            "id": place.id,
-            "title": place.title,
-            "description": place.description,
-            "latitude": place.latitude,
-            "longitude": place.longitude,
-            "owner": #implementar owner, acceder a los id,
-            "amenities": #implementar amenities
-        }
+        return marshal(place, place_model)
 
 
     @api.expect(place_model)
