@@ -1,6 +1,8 @@
 import re
 from app.models.basemodel import BaseModel
-from flask_bcrypt import bcrypt
+from flask_bcrypt import bcrypt, Bcrypt
+
+bcrypt = Bcrypt()
 
 class User(BaseModel):
     def __init__(self, first_name: str, last_name: str, email: str, password, is_admin=False):

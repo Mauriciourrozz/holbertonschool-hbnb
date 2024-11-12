@@ -24,7 +24,6 @@ class UserList(Resource):
 
         # Simulate email uniqueness check (to be replaced by real validation with persistence)
         existing_user = facade.get_user_by_email(user_data['email'])
-        password = User.hash_password(user_model, user_data['password'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
 
