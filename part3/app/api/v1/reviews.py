@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from flask_restx import Namespace, Resource, fields, marshal
 from app.services import facade
 from app.models.review import Review
@@ -17,6 +18,7 @@ class ReviewList(Resource):
     @api.expect(review_model)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         review_data = api.payload
         new_review = facade.create_review(review_data)
@@ -50,6 +52,7 @@ class ReviewResource(Resource):
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def put(self, review_id):
         review_data = api.payload
         review = facade.get_review(review_id)
@@ -58,6 +61,7 @@ class ReviewResource(Resource):
 
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')
+    @jwt_required()
     def delete(self, review_id):
         review_data = facade.get_review(review_id)
         facade.delete_review(review_id)

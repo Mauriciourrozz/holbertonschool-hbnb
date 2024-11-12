@@ -54,6 +54,7 @@ class UserResource(Resource):
     @api.expect(user_model, validate=True)
     @api.response(200, 'User successfully created')
     @api.response(400, 'Missing data')
+    @jwt_required()
     def put(self, user_id):
         if not request.is_json:
             return {"error": "Unsupported Media Type. Content-Type should be 'application/json'"}, 415

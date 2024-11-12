@@ -1,3 +1,4 @@
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restx import Namespace, Resource, fields, marshal
 from app.services import facade
 from app.models.user import User
@@ -34,6 +35,7 @@ class PlaceList(Resource):
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         place_data = api.payload
 
@@ -64,6 +66,7 @@ class PlaceList(Resource):
 class PlaceResource(Resource):
     @api.response(200, 'Place details retrieved successfully')
     @api.response(404, 'Place not found')
+
     def get(self, place_id):
         place = facade.get_place(place_id)
         return marshal(place, place_model)
@@ -73,10 +76,16 @@ class PlaceResource(Resource):
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def put(self, place_id):
         data = api.payload
+
+        current_user = get_jwt_identity()
+        place = facade.get_place(place_id)
+        if place.owner_id != current_user:
+            return {'error': 'Unauthorized action'}, 403
 
         if not data["title"] or not data["description"] or not data["longitude"] or not data["latitude"] or not data["price"]:
             return {"error": "Missing data"}, 400
         place = facade.update(place_id, data)
-        return {"message": "Place updated successfully"}, 200
+        return {"message": "Place updated successfully", "data": data}, 200
