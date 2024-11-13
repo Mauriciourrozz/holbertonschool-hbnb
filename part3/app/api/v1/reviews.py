@@ -1,4 +1,4 @@
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restx import Namespace, Resource, fields, marshal
 from app.services import facade
 from app.models.review import Review
@@ -21,14 +21,32 @@ class ReviewList(Resource):
     @jwt_required()
     def post(self):
         review_data = api.payload
+        current_user = get_jwt_identity()
+        
+        review = []
+        place = facade.get_place(review_data['place_id'])
+        reviews = facade.get_reviews_by_place(review_data['place_id'])
+
+        if place is None:
+            return {"error": "place not found"}, 400
+        
+        if review_data['user_id'] == place.owner_id:
+            return {"Error": "You cannot review your own place."}, 400
+        
+        # resultado = [review for review in reviews if review["user_id"] == current_user['id']]
+        
+        # if resultado:
+        #     return {"error": "You have already reviewed this place."}, 400
+    
         new_review = facade.create_review(review_data)
+
         return {
             "id": new_review.id,
             "text": new_review.text,
             "rating": new_review.rating,
             "user_id": new_review.user_id,
             "place_id": new_review.place_id
-        }
+        }, 200
 
     @api.response(200, 'List of reviews retrieved successfully')
     def get(self):
@@ -37,7 +55,7 @@ class ReviewList(Resource):
         for i in lista2:
             serializar = i.serializar_reviews()
             lista.append(serializar)
-        return marshal(lista, review_model)
+        return lista
 
 @api.route('/<review_id>')
 class ReviewResource(Resource):
@@ -56,6 +74,10 @@ class ReviewResource(Resource):
     def put(self, review_id):
         review_data = api.payload
         review = facade.get_review(review_id)
+        current_user = get_jwt_identity()
+        if review_data['user_id'] != current_user['id']:
+            return {"error": "Unauthorized action"}, 403
+
         facade.update_review(review_id, review_data)
         return {'message': 'Review updated successfully'}, 200
 
