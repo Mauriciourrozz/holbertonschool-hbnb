@@ -22,10 +22,16 @@ class ReviewList(Resource):
     def post(self):
         review_data = api.payload
         current_user = get_jwt_identity()
-        
-        review = []
         place = facade.get_place(review_data['place_id'])
-        reviews = facade.get_reviews_by_place(review_data['place_id'])
+        reviews = facade.get_all_reviews()
+        user = facade.get_user(review_data['user_id'])
+
+        for review in reviews:
+            if review.place_id == review_data['place_id'] and review.user_id == review_data['user_id']:
+                return {'error': "You have already reviewed this place."}, 400
+
+        if user is None:
+            return {"error": "User not found"}, 400
 
         if place is None:
             return {"error": "place not found"}, 400

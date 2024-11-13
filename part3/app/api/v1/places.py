@@ -38,9 +38,10 @@ class PlaceList(Resource):
     @jwt_required()
     def post(self):
         place_data = api.payload
-
+        current_user = get_jwt_identity()
         new_place = facade.create_place(place_data)
-
+        if current_user['id'] != place_data['owner_id']:
+            return {'error': 'not authorized', 'current': current_user}, 401
         return {
             "id": new_place.id,
             "title": new_place.title,
