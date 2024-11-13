@@ -79,10 +79,8 @@ class PlaceResource(Resource):
     @jwt_required()
     def put(self, place_id):
         data = api.payload
-
         current_user = get_jwt_identity()
-        place = facade.get_place(place_id)
-        if place.owner_id != current_user:
+        if data['owner_id'] != current_user['id']:
             return {'error': 'Unauthorized action'}, 403
 
         if not data["title"] or not data["description"] or not data["longitude"] or not data["latitude"] or not data["price"]:
