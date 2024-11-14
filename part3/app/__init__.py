@@ -1,3 +1,4 @@
+from datetime import timedelta
 from flask import Flask
 from flask_restx import Api
 from app.api.v1.users import api as users_ns
@@ -25,6 +26,12 @@ def create_app(config_class="config.DevelopmentConfig"):
     api.add_namespace(reviews_ns, path='/reviews')
     api.add_namespace(login_ns, path='/auth')
 
+    # Inicializar JWTManager
+    
+
     bcrypt.init_app(app)
     jwt.init_app(app)
+
+    
+
     return app
