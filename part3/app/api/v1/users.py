@@ -3,6 +3,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.user import User
+from werkzeug.security import check_password_hash
 
 api = Namespace('users', description='User operations')
 
@@ -66,13 +67,18 @@ class UserResource(Resource):
         if user_id != current_user['id']:
             return {"error": "Unauthorized action."}, 403
         
-        if user.email != data.get('email') or user.password != data.get('password'):
-            return {"error": "You cannot modify email or password."}, 400
+        
+        
+        if user.email != data.get('email') or not user.verify_password(data['password']):
+            return {"error": "You cannot modify email or password.", 
+                    "mostar": data['email'], "mostrar": data['password'],
+                    'mosar': user.email, 'mos': user.verify_password(data['password'])}, 400
         if not data.get("first_name") or not data.get("last_name"):
             return {"error": "Missing data"}, 400
 
-        user = facade.update(user_id, data)
         data['id'] = user_id
+        data['password'] = user.password
+        user = facade.update(user_id, data)
 
         return jsonify(data)
     
