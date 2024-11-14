@@ -26,23 +26,19 @@ class ReviewList(Resource):
         reviews = facade.get_all_reviews()
         user = facade.get_user(review_data['user_id'])
 
-        for review in reviews:
+        for review in reviews: #Ya hizo la review el usuario
             if review.place_id == review_data['place_id'] and review.user_id == review_data['user_id']:
                 return {'error': "You have already reviewed this place."}, 400
 
-        if user is None:
+        if review_data['user_id'] == place.owner_id: #el user no puede comentar su propio place
+            return {"Error": "You cannot review your own place."}, 400
+
+        if user is None: #User no existe
             return {"error": "User not found"}, 400
 
-        if place is None:
+        if place is None: #place no esxiste
             return {"error": "place not found"}, 400
-        
-        if review_data['user_id'] == place.owner_id:
-            return {"Error": "You cannot review your own place."}, 400
-        
-        # resultado = [review for review in reviews if review["user_id"] == current_user['id']]
-        
-        # if resultado:
-        #     return {"error": "You have already reviewed this place."}, 400
+               
     
         new_review = facade.create_review(review_data)
 
@@ -83,7 +79,7 @@ class ReviewResource(Resource):
         current_user = get_jwt_identity()
         if review_data['user_id'] != current_user['id']:
             return {"error": "Unauthorized action"}, 403
-
+        
         facade.update_review(review_id, review_data)
         return {'message': 'Review updated successfully'}, 200
 
@@ -92,6 +88,10 @@ class ReviewResource(Resource):
     @jwt_required()
     def delete(self, review_id):
         review_data = facade.get_review(review_id)
+        current_user = get_jwt_identity()
+        if review_data.user_id != current_user['id']:
+            return {"error": "Unauthorized action"}, 403
+        
         facade.delete_review(review_id)
         return {'message': 'Review deleted successfully'}, 200
 
@@ -100,5 +100,6 @@ class PlaceReviewList(Resource):
     @api.response(200, 'List of reviews for the place retrieved successfully')
     @api.response(404, 'Place not found')
     def get(self, place_id):
+        
         reviews_list = facade.get_reviews_by_place(place_id)
         return marshal(reviews_list, review_model), 200
