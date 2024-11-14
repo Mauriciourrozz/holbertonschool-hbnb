@@ -1,5 +1,5 @@
 from flask import json, jsonify, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.user import User
@@ -13,6 +13,7 @@ user_model = api.model('User', {
     'email': fields.String(required=True, description='Email of the user'),
     'password': fields.String(required=True, description='Password of the user')
 })
+
 @api.route('/')
 class UserList(Resource):
     @api.expect(user_model, validate=True)
@@ -60,7 +61,14 @@ class UserResource(Resource):
             return {"error": "Unsupported Media Type. Content-Type should be 'application/json'"}, 415
 
         data = api.payload
-        if not data.get("first_name") or not data.get("last_name") or not data.get("email"):
+        user = facade.get_user(user_id)
+        current_user = get_jwt_identity()
+        if user_id != current_user['id']:
+            return {"error": "Unauthorized action."}, 403
+        
+        if user.email != data.get('email') or user.password != data.get('password'):
+            return {"error": "You cannot modify email or password."}, 400
+        if not data.get("first_name") or not data.get("last_name"):
             return {"error": "Missing data"}, 400
 
         user = facade.update(user_id, data)
