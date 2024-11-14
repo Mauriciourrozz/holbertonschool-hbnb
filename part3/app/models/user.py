@@ -5,7 +5,7 @@ from flask_bcrypt import bcrypt, Bcrypt
 bcrypt = Bcrypt()
 
 class User(BaseModel):
-    def __init__(self, first_name: str, last_name: str, email: str, password, is_admin=False):
+    def __init__(self, first_name: str, last_name: str, email: str, password, is_admin = False):
         super().__init__()
         if self.validate_first_name(first_name) and self.validate_last_name(last_name):
             self.first_name = first_name
@@ -54,3 +54,4 @@ class User(BaseModel):
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
         return bcrypt.check_password_hash(self.password, password)
+    
