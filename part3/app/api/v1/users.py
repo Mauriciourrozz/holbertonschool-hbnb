@@ -100,7 +100,7 @@ class AdminUserCreate(Resource):
         current_user = get_jwt_identity()
         user = facade.get_user(current_user['id'])
 
-        if current_user['is_admin'] is False:
+        if current_user['is_admin'] == 'False':
             return {'error': 'Admin privileges required'}, 403
 
         user_data = request.json
