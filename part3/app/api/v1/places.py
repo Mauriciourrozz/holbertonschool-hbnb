@@ -88,3 +88,18 @@ class PlaceResource(Resource):
             return {"error": "Missing data"}, 400
         place = facade.update(place_id, data)
         return {"message": "Place updated successfully", "data": data}, 200
+    
+@api.route('/places/<place_id>')
+class AdminPlaceModify(Resource):
+    @jwt_required()
+    def put(self, place_id):
+        current_user = get_jwt_identity()
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+        user_id = current_user.get('id')
+
+        place = facade.get_place(place_id)
+        if not is_admin and place.owner_id != user_id: #comprueba que no sea la misma persona que lo creo
+            return {'error': 'Unauthorized action'}, 403
+

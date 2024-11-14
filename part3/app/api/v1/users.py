@@ -22,21 +22,21 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
-    @jwt_required(optional=True)
+    @jwt_required()
     def post(self):
         """Register a new user"""
         user_data = api.payload
         current_user = get_jwt_identity()
+                    
         # Simulate email uniqueness check (to be replaced by real validation with persistence)
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
         
         new_user = facade.create_user(user_data)
-        if current_user is not None and current_user['is_admin'] == True:
-            return {'id': new_user.id, 'mensaje': 'Creado con exito'}, 201
-        else:
-            return {'id': new_user.id, 'mensaje': 'Registrado con exito'}, 201
+       
+    
+        return {'id': new_user.id, 'mensaje': 'Registrado con exito'}, 201
 
     def get(self):
         lista = []
@@ -65,47 +65,63 @@ class UserResource(Resource):
     def put(self, user_id):
         if not request.is_json:
             return {"error": "Unsupported Media Type. Content-Type should be 'application/json'"}, 415
-        
-
-
+    
         data = api.payload
         user = facade.get_user(user_id)
         current_user = get_jwt_identity()
-        if user_id != current_user['id']:
+        if user_id != current_user['id']: #Comprueba que el usuario este logueado
             return {"error": "Unauthorized action."}, 403
         
-        if current_user['is_admin'] == False:
-            if user.email != data.get('email') or not user.verify_password(data['password']):
-                return {"error": "You cannot modify email or password."}, 400
-            if not data.get("first_name") or not data.get("last_name"):
-                return {"error": "Missing data"}, 400
-            data['password'] = user.password
-        else:
-            data['password'] = user.hash_password(data['password'])
+        if user.email != data.get('email') or not user.verify_password(data['password']): #comprueba que no cambiemos la contraseña y el email
+            return {"error": "You cannot modify email or password."}, 400
+        
+        if not data.get("first_name") or not data.get("last_name"): #que no falte data
+            return {"error": "Missing data"}, 400
+        
+        data['password'] = user.hash_password(data['password']) #guardamos la contraseña hasheada
             
         data['id'] = user_id
         user = facade.update(user_id, data)
 
         return jsonify(data)
     
+@api.route('/users/')
+class AdminUserCreate(Resource):
+    @jwt_required()
+    def post(self):
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
+        user_data = request.json
+        email = user_data.get('email')
+
+        # Check if email is already in use
+        if facade.get_user_by_email(email):
+            return {'error': 'Email already registered'}, 400
+        
+        new_user = facade.create_user(user_data)
+        return {'id': new_user.id, 'mensaje': 'Registrado con exito'}, 201
+        
 @api.route('/users/<user_id>')
-class AdminUserResource(Resource):
+class AdminUserModify(Resource):
     @jwt_required()
     def put(self, user_id):
         current_user = get_jwt_identity()
-        
-        # If 'is_admin' is part of the identity payload
         if not current_user.get('is_admin'):
             return {'error': 'Admin privileges required'}, 403
 
         data = request.json
         email = data.get('email')
 
-        if email:
-            # Check if email is already in use
+        # Ensure email uniqueness
+        if email: 
             existing_user = facade.get_user_by_email(email)
             if existing_user and existing_user.id != user_id:
-                return {'error': 'Email is already in use'}, 400
+                return {'error': 'Email already in use'}, 400
+        
+        data['password'] = user.hash_password(data['password'])
+        data['id'] = user_id
+        user = facade.update(user_id, data)
 
-        # Logic to update user details, including email and password
-        pass
+        return jsonify(data)

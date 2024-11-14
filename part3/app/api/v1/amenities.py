@@ -1,3 +1,4 @@
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.amenity import Amenity
@@ -14,6 +15,7 @@ class AmenityList(Resource):
     @api.expect(amenity_model)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         amenitie_data = api.payload
         new_amenitie = facade.create_amenity(amenitie_data)
@@ -54,5 +56,33 @@ class AmenityResource(Resource):
         if not data["name"]:
             return {"error": "Missing data"}, 400
 
-        amenities = facade.update_amenity(amenity_id, data)
+        facade.update_amenity(amenity_id, data)
+        return {"message": "Amenity updated successfully"}, 200
+
+@api.route('/amenities/')
+class AdminAmenityCreate(Resource):
+    @jwt_required()
+    def post(self):
+        
+        amenitie_data = api.payload
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+        
+        new_amenitie = facade.create_amenity(amenitie_data)
+        return {
+            'id': new_amenitie.id,
+            'name': new_amenitie.name
+            }, 201
+    
+@api.route('/amenities/<amenity_id>')
+class AdminAmenityModify(Resource):
+    @jwt_required()
+    def put(self, amenity_id):
+        amenitie_data = api.payload
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+        
+        facade.update_amenity(amenity_id, amenitie_data)
         return {"message": "Amenity updated successfully"}, 200
