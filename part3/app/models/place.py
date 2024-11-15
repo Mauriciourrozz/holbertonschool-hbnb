@@ -1,7 +1,8 @@
 from app.models.basemodel import BaseModel
 from app.models.user import User
 from app import db
-from sqlalchemy.orm import validates, String
+from sqlalchemy.orm import validates, String, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 class Place(BaseModel):
     # def __init__(self, title: str, description: str, price: float, latitude: float, longitude: float, owner_id, amenities):
@@ -28,7 +29,7 @@ class Place(BaseModel):
     price = db.Column(db.Integer, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
-    owner_id = db.Column(db.String(100), nullable=False)
+    owner_id = db.Column(db.String(100), ForeignKey('users.id'), nullable=False)
     amenities = db.Column(db.ARRAY(String), nullable=True)
 
     @staticmethod

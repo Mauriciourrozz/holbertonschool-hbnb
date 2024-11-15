@@ -4,7 +4,7 @@ from flask_bcrypt import bcrypt, Bcrypt
 from app import db, bcrypt
 import uuid
 from .basemodel import BaseModel
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
 
 bcrypt = Bcrypt()
 
@@ -16,8 +16,8 @@ class User(BaseModel):
     email = db.Column(db.String(120), nullable=False, unique=True) #String, notNull y único
     password = db.Column(db.String(128), nullable=False) #String y notNull
     is_admin = db.Column(db.Boolean, default=False) #Boolean y False por defecto
-    
-        
+    user = relationship('Place', backref='User', lazy=True)
+
     @staticmethod
     @validates('email')
     def validate_email(email):
