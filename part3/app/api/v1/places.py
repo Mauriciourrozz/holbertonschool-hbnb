@@ -108,7 +108,7 @@ class AdminPlaceModify(Resource):
             if not data["title"] or not data["description"] or not data["longitude"] or not data["latitude"] or not data["price"]:
                 return {"error": "Missing data"}, 400
             
-            if data['longitude'] != place.longitude or data['latitude'] != user.latitude:
+            if data['longitude'] != place.longitude or data['latitude'] != place.latitude:
                 return {"error": "Cannot modify Latitude or Longitude "}, 400
             
         place = facade.update(place_id, data)
