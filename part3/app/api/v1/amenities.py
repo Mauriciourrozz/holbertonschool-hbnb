@@ -10,18 +10,17 @@ amenity_model = api.model('Amenity', {
     'name': fields.String(required=True, description='Name of the amenity')
 })
 
-@api.route('/')
-class AmenityList(Resource):
+@api.route('/amenities/')
+class AdminAmenityCreate(Resource):
     @api.expect(amenity_model)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
-    @jwt_required()
     @jwt_required()
     def post(self):
         
         amenitie_data = api.payload
         current_user = get_jwt_identity()
-        if not current_user.get('is_admin'):
+        if current_user["is_admin"] == False:
             return {'error': 'Admin privileges required'}, 403
         
         new_amenitie = facade.create_amenity(amenitie_data)
@@ -41,8 +40,8 @@ class AmenityList(Resource):
         return lista
 
 
-@api.route('/<amenity_id>')
-class AmenityResource(Resource):
+@api.route('/amenities/<amenity_id>')
+class AdminAmenityModify(Resource):
     @api.response(200, 'Amenity details retrieved successfully')
     @api.response(404, 'Amenity not found')
     def get(self, amenity_id):
@@ -62,7 +61,7 @@ class AmenityResource(Resource):
     def put(self, amenity_id):
         amenitie_data = api.payload
         current_user = get_jwt_identity()
-        if not current_user.get('is_admin'):
+        if current_user["is_admin"] == False:
             return {'error': 'Admin privileges required'}, 403
         
         facade.update_amenity(amenity_id, amenitie_data)

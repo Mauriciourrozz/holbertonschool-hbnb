@@ -94,7 +94,8 @@ class AdminPlaceModify(Resource):
     @jwt_required()
     def put(self, place_id):
         current_user = get_jwt_identity()
-
+        data = api.payload
+        place = facade.get_place(place_id)
         # Set is_admin default to False if not exists
         is_admin = current_user.get('is_admin', False)
         user_id = current_user.get('id')
@@ -102,4 +103,15 @@ class AdminPlaceModify(Resource):
         place = facade.get_place(place_id)
         if not is_admin and place.owner_id != user_id: #comprueba que no sea la misma persona que lo creo
             return {'error': 'Unauthorized action'}, 403
+        
+        if not is_admin:
+            if not data["title"] or not data["description"] or not data["longitude"] or not data["latitude"] or not data["price"]:
+                return {"error": "Missing data"}, 400
+            
+            if data['longitude'] != place.longitude or data['latitude'] != user.latitude:
+                return {"error": "Cannot modify Latitude or Longitude "}, 400
+            
+        place = facade.update(place_id, data)
+        return {"message": "Place updated successfully", "data": data}, 200
+        
 
