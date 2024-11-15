@@ -1,6 +1,7 @@
 from datetime import timedelta
 from flask import Flask
 from flask_restx import Api
+from flask_sqlalchemy import SQLAlchemy
 from app.api.v1.users import api as users_ns
 from app.api.v1.amenities import api as amenities_ns
 from app.api.v1.places import api as places_ns
@@ -12,6 +13,8 @@ from app.api.v1.auth import api as login_ns
 bcrypt = Bcrypt()
 
 jwt = JWTManager()
+
+db = SQLAlchemy()
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
@@ -26,9 +29,10 @@ def create_app(config_class="config.DevelopmentConfig"):
     api.add_namespace(reviews_ns, path='/reviews')
     api.add_namespace(login_ns, path='/auth')
 
-    # Inicializar JWTManager
-    
+    # Inicializar SQLAlchemy
+    db.init_app(app)
 
+    # Inicializar JWTManager
     bcrypt.init_app(app)
     jwt.init_app(app)
 
