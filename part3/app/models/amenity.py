@@ -1,14 +1,18 @@
 from app.models.basemodel import BaseModel
+from app import db
 
 class Amenity(BaseModel):
-    def __init__(self, name: str):
-        super().__init__()
-        if type(name) is str and len(name) <= 50:
-            self.name = name
+    # def __init__(self, name: str):
+    #     super().__init__()
+    #     if type(name) is str and len(name) <= 50:
+    #         self.name = name
+
+    __tablename__ = 'review'
+
+    name = db.Column(db.String(50), nullable=False)
 
     def serializar_amenities(self):
         return {
             'id': self.id,
             'name': self.name
         }
-

@@ -1,24 +1,38 @@
 from app.models.basemodel import BaseModel
 from app.models.user import User
+from app import db
+from sqlalchemy.orm import validates, String
 
 class Place(BaseModel):
-    def __init__(self, title: str, description: str, price: float, latitude: float, longitude: float, owner_id, amenities):
-        super().__init__()
-        if self.validate_title(title):
-            self.title = title
-        if self.validate_description(description):
-            self.description = description
-        if self.validate_price(price):
-            self.price = price
-        if self.validate_latitude(latitude):
-            self.latitude = latitude
-        if self.validate_longitude(longitude):
-            self.longitude = longitude
-        self.owner_id = owner_id
-        self.reviews = []
-        self.amenities = [amenities]
+    # def __init__(self, title: str, description: str, price: float, latitude: float, longitude: float, owner_id, amenities):
+    #     super().__init__()
+    #     if self.validate_title(title):
+    #         self.title = title
+    #     if self.validate_description(description):
+    #         self.description = description
+    #     if self.validate_price(price):
+    #         self.price = price
+    #     if self.validate_latitude(latitude):
+    #         self.latitude = latitude
+    #     if self.validate_longitude(longitude):
+    #         self.longitude = longitude
+    #     self.owner_id = owner_id
+    #     self.reviews = []
+    #     self.amenities = [amenities]
+
+
+    __tablename__ = 'place'
+
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(150), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    owner_id = db.Column(db.String(100), nullable=False)
+    amenities = db.Column(db.ARRAY(String), nullable=True)
 
     @staticmethod
+    @validates('title')
     def validate_title(title):
         if type(title) is not str:
             raise TypeError("Title not valid")
@@ -27,12 +41,14 @@ class Place(BaseModel):
         return True
 
     @staticmethod
+    @validates('description')
     def validate_description(description):
         if type(description) is not str:
             raise TypeError("Description not valid")
         return True
 
     @staticmethod
+    @validates('price')
     def validate_price(price):
         if type(price) is not float and type(price) is not int:
             raise ValueError("Error: Price not valid")
@@ -41,6 +57,7 @@ class Place(BaseModel):
         return True
 
     @staticmethod
+    @validates('latitude')
     def validate_latitude(latitude):
         if type(latitude) is not float and type(latitude) is not int:
             raise TypeError("Latitude not valid")
@@ -49,6 +66,7 @@ class Place(BaseModel):
         return True
 
     @staticmethod
+    @validates('longitude')
     def validate_longitude(longitude):
         if type(longitude) is not float and type(longitude) is not int:
             raise TypeError("Longitude not valid")

@@ -3,19 +3,31 @@ from app.models.basemodel import BaseModel
 from flask_bcrypt import bcrypt, Bcrypt
 from app import db, bcrypt
 import uuid
-from .base_model import BaseModel
+from .basemodel import BaseModel
+from sqlalchemy.orm import validates
 
 bcrypt = Bcrypt()
 
 class User(BaseModel):
     __tablename__ = 'users'
 
-     first_name = db.Column(db.String(50), nullable=False) #String y notNull
-     last_name = db.Column(db.String(50), nullable=False) #String y notNull
-     email = db.Column(db.String(120), nullable=False, unique=True) #String, notNull y único
-     password = db.Column(db.String(128), nullable=False) #String y notNull
-     is_admin = db.Column(db.Boolean, default=False) #Boolean y False por defecto
+    first_name = db.Column(db.String(50), nullable=False) #String y notNull
+    last_name = db.Column(db.String(50), nullable=False) #String y notNull
+    email = db.Column(db.String(120), nullable=False, unique=True) #String, notNull y único
+    password = db.Column(db.String(128), nullable=False) #String y notNull
+    is_admin = db.Column(db.Boolean, default=False) #Boolean y False por defecto
     
+        
+    @staticmethod
+    @validates('email')
+    def validate_email(email):
+        regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+$'
+        if re.match(regex, email):
+            return True
+        else:
+            raise TypeError("Email not valid")
+        
+
     def serializar_usuario(self):
         return {
             "id": self.id,
