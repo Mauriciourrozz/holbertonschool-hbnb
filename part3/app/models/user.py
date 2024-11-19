@@ -16,7 +16,8 @@ class User(BaseModel):
     email = db.Column(db.String(120), nullable=False, unique=True) #String, notNull y único
     password = db.Column(db.String(128), nullable=False) #String y notNull
     is_admin = db.Column(db.Boolean, default=False) #Boolean y False por defecto
-    user = relationship('Place', backref='User', lazy=True)
+    places = relationship('places', backref='user', lazy=True)
+    reviews = relationship('review', backref='user', lazy=True)
 
     @staticmethod
     @validates('email')
@@ -26,7 +27,7 @@ class User(BaseModel):
             return True
         else:
             raise TypeError("Email not valid")
-        
+
 
     def serializar_usuario(self):
         return {

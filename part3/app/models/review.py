@@ -5,20 +5,23 @@ from app import db
 from sqlalchemy.orm import validates
 
 class Review(BaseModel):
-    # def __init__(self, text: str, rating: int, place_id , user_id):
-    #     super().__init__()
-    #     if self.validate_text(text):
-    #         self.text = text
-    #     if self.validate_rating(rating):
-    #         self.rating = rating
-    #     self.place_id = place_id
-    #     self.user_id = user_id
+
     __tablename__ = 'review'
 
     text = db.Column(db.String(200), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
-    place_id = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.String(100), nullable=False)
+    place_id = db.Column(db.String(100), db.ForeignKey('place.id'), nullable=False)
+    user_id = db.Column(db.String(100), db.ForeignKey('users.id') ,nullable=False)
+
+    def __init__(self, text: str, rating: int, place_id , user_id):
+        super().__init__()
+        if self.validate_text(text):
+            self.text = text
+        if self.validate_rating(rating):
+            self.rating = rating
+        self.place_id = place_id
+        self.user_id = user_id
+
 
     @staticmethod
     @validates('text')
