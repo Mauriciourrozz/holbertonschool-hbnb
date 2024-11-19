@@ -1,9 +1,7 @@
 import re
-from app.models.basemodel import BaseModel
+from app.models.baseclass import BaseModel
 from flask_bcrypt import bcrypt, Bcrypt
 from app import db, bcrypt
-import uuid
-from .basemodel import BaseModel
 from sqlalchemy.orm import validates, relationship
 
 bcrypt = Bcrypt()

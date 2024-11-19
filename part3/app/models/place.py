@@ -1,27 +1,18 @@
-from app.models.basemodel import BaseModel
+from app.models.baseclass import BaseModel
 from app import db
 from sqlalchemy.orm import validates
 
 
-place_amenity = db.Table( #Tabla intermedia
-'place_amenities',
-db.Column('place_id', db.String(100), db.ForeignKey('places.id'), primary_key=True),
-db.Column('amenity_id', db.String(100), db.ForeignKey('amenities.id'), primary_key=True)
-)
-
 class Place(BaseModel):
 
-    __tablename__ = 'places'
-
-    id = db.Column(db.String(100), nullable=False, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(150), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     owner_id = db.relationship('users', backref='owner', lazy=True)
-    amenities =  db.relationship('amenities', secondary=place_amenity, backref='places')
     reviews = db.relationship('review', backref='place', lazy=True)
+    amenities =  db.relationship('amenities', secondary='place_amenities', backref='places')
 
     def __init__(self, title: str, description: str, price: float, latitude: float, longitude: float, owner_id, amenities):
         super().__init__()
@@ -37,7 +28,7 @@ class Place(BaseModel):
             self.longitude = longitude
         self.owner_id = owner_id
         self.reviews = []
-        self.amenities = [amenities]
+        self.amenities = amenities
     
 
     @staticmethod
@@ -96,3 +87,7 @@ class Place(BaseModel):
                 "latitude": self.latitude,
                 "longitude": self.longitude
             }
+    
+class PlaceAmenity(db.Model):
+    amenity_id = db.Column(db.String, db.ForeignKey("amenity.id"), primary_key=True)
+    place_id = db.Column(db.String, db.ForeignKey("place.id"), primary_key=True)

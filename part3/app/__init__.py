@@ -21,7 +21,6 @@ def create_app(config_class="config.DevelopmentConfig"):
     from app.api.v1.places import api as places_ns
     from app.api.v1.reviews import api as reviews_ns
     from app.api.v1.auth import api as login_ns
-
     # Register the users namespace
     api.add_namespace(users_ns, path='/users')
     api.add_namespace(amenities_ns, path='/amenities')
@@ -37,6 +36,11 @@ def create_app(config_class="config.DevelopmentConfig"):
     jwt.init_app(app)
 
     with app.app_context():
+        from app.models.amenity import Amenity
+        from app.models.place import Place, PlaceAmenity
+        from app.models.review import Review
+        from app.models.user import User
+
         db.create_all()
 
     
