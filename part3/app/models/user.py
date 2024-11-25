@@ -14,17 +14,16 @@ class User(BaseModel):
     email = db.Column(db.String(120), nullable=False, unique=True) #String, notNull y único
     password = db.Column(db.String(128), nullable=False) #String y notNull
     is_admin = db.Column(db.Boolean, default=False) #Boolean y False por defecto
-    places = relationship('places', backref='user', lazy=True)
-    reviews = relationship('review', backref='user', lazy=True)
+    places = relationship('Place', backref='user', lazy=True)
+    reviews = db.relationship('Review', back_populates='user', lazy=True)
 
-    def __init__(self, text: str, rating: int, place_id , user_id):
+    def __init__(self, first_name, last_name, email, password, is_admin=False):
         super().__init__()
-        if self.validate_text(text):
-            self.text = text
-        if self.validate_rating(rating):
-            self.rating = rating
-        self.place_id = place_id
-        self.user_id = user_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email = email
+        self.password = self.hash_password(password)  # Store the hashed password
+        self.is_admin = is_admin
 
     @staticmethod
     @validates('email')

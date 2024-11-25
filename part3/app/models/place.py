@@ -2,17 +2,17 @@ from app.models.baseclass import BaseModel
 from app import db
 from sqlalchemy.orm import validates
 
-
 class Place(BaseModel):
 
+    __tablename__ = 'places'
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(150), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
-    owner_id = db.relationship('users', backref='owner', lazy=True)
-    reviews = db.relationship('review', backref='place', lazy=True)
-    amenities =  db.relationship('amenities', secondary='place_amenities', backref='places')
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    reviews = db.relationship('Review', back_populates='place', lazy=True)
+    amenities = db.relationship('Amenity', secondary='place_amenities', back_populates='places', lazy=True)
 
     def __init__(self, title: str, description: str, price: float, latitude: float, longitude: float, owner_id, amenities):
         super().__init__()
@@ -87,7 +87,7 @@ class Place(BaseModel):
                 "latitude": self.latitude,
                 "longitude": self.longitude
             }
-    
 class PlaceAmenity(db.Model):
-    amenity_id = db.Column(db.String, db.ForeignKey("amenity.id"), primary_key=True)
-    place_id = db.Column(db.String, db.ForeignKey("place.id"), primary_key=True)
+    __tablename__ = 'place_amenities'
+    amenity_id = db.Column(db.String(100), db.ForeignKey('amenities.id'), primary_key=True)
+    place_id = db.Column(db.String(100), db.ForeignKey('places.id'), primary_key=True)

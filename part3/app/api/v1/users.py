@@ -1,10 +1,7 @@
-from datetime import timedelta
 from flask import app, json, jsonify, request
 from flask_jwt_extended import JWTManager, get_jwt_identity, jwt_required, get_jwt
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
-from app.models.user import User
-from werkzeug.security import check_password_hash
 
 api = Namespace('admin', description='Admin operations')
 api = Namespace('users', description='User operations')
@@ -117,7 +114,7 @@ class AdminUserModify(Resource):
 
         return jsonify(data)
 
-@api.route('/probar')
+@api.route('/admin')
 class probar(Resource):
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
