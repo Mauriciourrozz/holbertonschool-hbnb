@@ -17,6 +17,15 @@ class User(BaseModel):
     places = relationship('places', backref='user', lazy=True)
     reviews = relationship('review', backref='user', lazy=True)
 
+    def __init__(self, text: str, rating: int, place_id , user_id):
+        super().__init__()
+        if self.validate_text(text):
+            self.text = text
+        if self.validate_rating(rating):
+            self.rating = rating
+        self.place_id = place_id
+        self.user_id = user_id
+
     @staticmethod
     @validates('email')
     def validate_email(email):
