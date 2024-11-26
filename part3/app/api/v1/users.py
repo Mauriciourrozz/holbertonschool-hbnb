@@ -39,7 +39,7 @@ class UserList(Resource):
         
         
         new_user = facade.create_user(user_data)
-        return {'id': new_user.id, 'mensaje': 'Registrado con exito (admin)', 'error': current_user}, 201
+        return {'id': new_user.id, 'mensaje': 'Registrado con exito (admin)'}, 201
 
     def get(self):
         lista = []
@@ -53,6 +53,7 @@ class UserList(Resource):
 class UserResource(Resource):
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
+    
     def get(self, user_id):
         """Get user details by ID"""
         user = facade.get_user(user_id)
@@ -68,7 +69,7 @@ class UserResource(Resource):
     def put(self, user_id):
         if not request.is_json:
             return {"error": "Unsupported Media Type. Content-Type should be 'application/json'"}, 415
-    
+        
         data = api.payload
         user = facade.get_user(user_id)
         current_user = get_jwt_identity()
@@ -91,7 +92,7 @@ class UserResource(Resource):
         return jsonify(data)
     
 
-@api.route('/users/<user_id>')
+@api.route('/admin/<user_id>')
 class AdminUserModify(Resource):
     @jwt_required()
     def put(self, user_id):
@@ -101,7 +102,6 @@ class AdminUserModify(Resource):
 
         data = request.json
         email = data.get('email')
-
         # Ensure email uniqueness
         if email: 
             existing_user = facade.get_user_by_email(email)
@@ -115,7 +115,7 @@ class AdminUserModify(Resource):
         return jsonify(data)
 
 @api.route('/admin')
-class probar(Resource):
+class admin_create(Resource):
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
@@ -131,4 +131,4 @@ class probar(Resource):
         
         
         new_user = facade.create_user(user_data)
-        return {'id': new_user.id, 'mensaje': 'Registrado con exito (admin)'}, 201
+        return {'id': new_user.id, 'msj': 'Succesfully created (admin)'}, 201
